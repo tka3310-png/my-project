@@ -9,9 +9,9 @@ import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { submitContactInquiry } from "@/lib/api/contact"
 
-// ─── 한글 이름 유효성 검사 ──────────────────────────────────────────
-const isKoreanName = (value: string) =>
-  /^[가-힣\s]{2,20}$/.test(value.trim())
+// ─── 이름 유효성 검사 (한글/영문) ──────────────────────────────────
+const isValidName = (value: string) =>
+  /^[가-힣a-zA-Z\s]{2,20}$/.test(value.trim())
 
 // ─── 상태 타입 ──────────────────────────────────────────────────────
 type SubmitState = "idle" | "submitting" | "success" | "error"
@@ -24,11 +24,11 @@ export default function ContactPage() {
   const [submitError, setSubmitError] = React.useState<string | null>(null)
 
   // ── 유효성 ──
-  const nameError = touched.name && name.length > 0 && !isKoreanName(name)
-    ? "한글 이름만 입력 가능합니다 (2~20자)"
+  const nameError = touched.name && name.length > 0 && !isValidName(name)
+    ? "한글 또는 영문 이름만 입력 가능합니다 (2~20자)"
     : undefined
 
-  const isNameValid = isKoreanName(name)
+  const isNameValid = isValidName(name)
   const isMessageValid = message.trim().length >= 10
 
   // 버튼 활성화 조건: 이름+내용 모두 유효
@@ -120,9 +120,9 @@ export default function ContactPage() {
               >
                 {/* 이름 */}
                 <Input
-                  label="이름 (한글)"
-                  description="실명을 한글로 입력해 주세요"
-                  placeholder="홍길동"
+                  label="이름 (한글/영문)"
+                  description="실명을 한글 또는 영문으로 입력해 주세요"
+                  placeholder="Hong Gil Dong"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   onBlur={() => setTouched((t) => ({ ...t, name: true }))}
@@ -199,12 +199,12 @@ export default function ContactPage() {
                         <span
                           className={cn(
                             "w-1.5 h-1.5 rounded-full",
-                            name.length > 0 && isKoreanName(name)
+                            name.length > 0 && isValidName(name)
                               ? "bg-positive-500"
                               : "bg-neutral-400"
                           )}
                         />
-                        한글 이름 입력 (2~20자)
+                        한글 또는 영문 이름 입력 (2~20자)
                       </li>
                     )}
                     {!isMessageValid && (
